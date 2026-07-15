@@ -1,0 +1,21 @@
+class Solution {
+public:
+    int findComplement(int num) {
+        string binary = "";
+        int temp = num;
+        while (temp > 0) {
+            binary = char('0' + (temp % 2)) + binary;  // build binary string
+            temp /= 2;
+        }
+        string flipped = "";
+        for (char ch : binary) {
+            if (ch == '0') flipped += '1';
+            else flipped += '0';
+        }
+        int result = 0;
+        for (char ch : flipped) {
+            result = result * 2 + (ch - '0');
+      }
+        return result;
+    }
+};
