@@ -1,0 +1,42 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+long long myAtoi(const string &s) {
+    int i = 0, n = s.size();
+    while (i < n && s[i] == ' ') i++;
+
+    int sign = 1;
+    if (i < n && (s[i] == '+' || s[i] == '-')) {
+        if (s[i] == '-') sign = -1;
+        i++;
+    }
+
+    long long result = 0;
+    bool found = false;
+    while (i < n && isdigit((unsigned char)s[i])) {
+        found = true;
+        result = result * 10 + (s[i] - '0');
+        if (sign == 1 && result > 2147483647LL) { result = 2147483647LL; break; }
+        if (sign == -1 && result > 2147483648LL) { result = 2147483648LL; break; }
+        i++;
+    }
+
+    if (!found) return 0;
+
+    result *= sign;
+    if (result < -2147483648LL) result = -2147483648LL;
+    if (result > 2147483647LL) result = 2147483647LL;
+    return result;
+}
+
+int main() {
+    int t;
+    cin >> t;
+    cin.ignore();
+    while (t--) {
+        string s;
+        getline(cin, s);
+        cout << myAtoi(s) << "\n";
+    }
+    return 0;
+}
