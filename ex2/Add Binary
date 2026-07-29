@@ -1,0 +1,40 @@
+#include <stdlib.h>
+#include <string.h>
+
+char* addBinary(char* a, char* b) {
+    int i = strlen(a) - 1;
+    int j = strlen(b) - 1;
+    
+    // Max possible length: the longest string + 1 (for a potential carry)
+    // We add +2 to the allocation because we also need room for the '\0' terminator
+    int len = (i > j ? i : j) + 2; 
+    
+    char* res = (char*)malloc(len + 1);
+    res[len] = '\0'; // Put the null terminator at the very end
+    
+    int k = len - 1; // Start filling from right to left
+    int carry = 0;
+    
+    while (i >= 0 || j >= 0 || carry > 0) {
+        int sum = carry;
+        
+        if (i >= 0) sum += a[i--] - '0';
+        if (j >= 0) sum += b[j--] - '0';
+        
+        // Bitwise operations instead of % 2 and / 2
+        // sum & 1 isolates the last bit (identical to sum % 2)
+        res[k--] = (sum & 1) + '0';
+        
+        // sum >> 1 shifts the bits right by 1 (identical to sum / 2)
+        carry = sum >> 1;
+    }
+    
+    // If 'k' ended at 0 instead of -1, it means we didn't have a final carry over 
+    // to fill the very first slot of our array. 
+    // We shift the memory left by 1 to remove the leading empty byte.
+    if (k == 0) {
+        memmove(res, res + 1, len);
+    }
+    
+    return res;
+}
