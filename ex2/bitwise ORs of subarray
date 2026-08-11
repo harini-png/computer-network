@@ -1,0 +1,72 @@
+#include <stdlib.h>
+
+int subarrayBitwiseORs(int* arr, int arrSize) {
+    if (arrSize == 0) return 0;
+
+    // Buffer to hold unique values found so far.
+    // We allocate a flat layout size to keep tracking simple.
+    int* uniqueResults = (int*)malloc(arrSize * 32 * sizeof(int));
+    int totalUniqueCount = 0;
+
+    // Buffers to track OR values ending at the current and previous positions.
+    // The bitwise OR sequence can change at most 32 times.
+    int prevOrs[32];
+    int prevSize = 0;
+
+    for (int i = 0; i < arrSize; i++) {
+        int currentVal = arr[i];
+        
+        int currOrs[32];
+        int currSize = 0;
+
+        // Step 1: Start a new subarray using only the current element
+        currOrs[currSize++] = currentVal;
+
+        // Step 2: Combine the current element with all previous OR results
+        for (int j = 0; j < prevSize; j++) {
+            int newVal = prevOrs[j] | currentVal;
+            
+            // Check if this combined value is already in our current tracking list
+            int isDuplicate = 0;
+            for (int k = 0; k < currSize; k++) {
+                if (currOrs[k] == newVal) {
+                    isDuplicate = 1;
+                    break;
+                }
+            }
+            
+            // If it is a new variation, add it
+            if (!isDuplicate) {
+                currOrs[currSize++] = newVal;
+            }
+        }
+
+        // Step 3: Add all newly discovered unique values into our main global list
+        for (int j = 0; j < currSize; j++) {
+            int valToInsert = currOrs[j];
+            
+            int isGloballyDuplicate = 0;
+            for (int k = 0; k < totalUniqueCount; k++) {
+                if (uniqueResults[k] == valToInsert) {
+                    isGloballyDuplicate = 1;
+                    break;
+                }
+            }
+            
+            if (!isGloballyDuplicate) {
+                uniqueResults[totalUniqueCount++] = valToInsert;
+            }
+        }
+
+        // Step 4: Transfer current values to the previous buffer for the next iteration
+        for (int j = 0; j < currSize; j++) {
+            prevOrs[j] = currOrs[j];
+        }
+        prevSize = currSize;
+    }
+
+    // Clean up allocated memory space
+    free(uniqueResults);
+
+    return totalUniqueCount;
+}
