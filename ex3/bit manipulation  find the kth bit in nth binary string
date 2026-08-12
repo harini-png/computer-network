@@ -1,0 +1,25 @@
+char findKthBit(int n, int k) {
+    // Base Case: S_1 is always "0"
+    if (n == 1) {
+        return '0';
+    }
+    
+    // Total length of S_n is (2^n) - 1
+    int length = (1 << n) - 1;
+    int mid = length / 2 + 1;
+    
+    if (k == mid) {
+        // The middle bit is always '1'
+        return '1';
+    } else if (k < mid) {
+        // Look into the left part which is identical to S_(n-1)
+        return findKthBit(n - 1, k);
+    } else {
+        // Look into the right part which is inverted and reversed
+        // Find the symmetric position in the left part
+        int symmetric_k = length - k + 1;
+        char bit = findKthBit(n - 1, symmetric_k);
+        // Invert the bit ('0' -> '1', '1' -> '0')
+        return (bit == '0') ? '1' : '0';
+    }
+}
