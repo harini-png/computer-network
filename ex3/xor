@@ -1,0 +1,23 @@
+int totalHammingDistance(int* nums, int numsSize) {
+    int total_distance = 0;
+    
+    // Loop through all 32 bit positions (since 0 <= nums[i] <= 10^9 fits in 30 bits)
+    for (int i = 0; i < 32; i++) {
+        int count_ones = 0;
+        
+        // Count how many numbers have a '1' at the i-th bit position
+        for (int j = 0; j < numsSize; j++) {
+            if ((nums[j] >> i) & 1) {
+                count_ones++;
+            }
+        }
+        
+        // The remaining numbers must have a '0' at this bit position
+        int count_zeros = numsSize - count_ones;
+        
+        // Total pairs with different bits at this position
+        total_distance += count_ones * count_zeros;
+    }
+    
+    return total_distance;
+}
