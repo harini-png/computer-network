@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Helper function to find the insertion index using binary search
+int binarySearch(int* window, int size, long long target) {
+    int low = 0, high = size - 1;
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (window[mid] == target) return mid;
+        else if (window[mid] < target) low = mid + 1;
+        else high = mid - 1;
+    }
+    return low;
+}
+
+/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+double* medianSlidingWindow(int* nums, int numsSize, int k, int* returnSize) {
+    *returnSize = numsSize - k + 1;
+    double* result = (double*)malloc((*returnSize) * sizeof(double));
+    
+    // Allocate space to maintain the sorted elements of the current window
+    int* window = (int*)malloc(k * sizeof(int));
+    
+    // Initialize the first window
+    for (int i = 0; i < k; i++) {
+        window[i] = nums[i];
+    }
+    
+    // Sort the initial window using a simple insertion sort logic or qsort
+    // Using simple insertion sort loop for k elements
+    for (int i = 1; i < k; i++) {
+        int key = window[i];
+        int j = i - 1;
+        while (j >= 0 && window[j] > key) {
+            window[j + 1] = window[j];
+            j--;
+        }
+        window[j + 1] = key;
+    }
+    
+    int resultIdx = 0;
+    
+    // Process the windows
+    for (int i = k; i <= numsSize; i++) {
+        // Calculate median of current sorted window
+        if (k % 2 == 1) {
+            result[resultIdx++] = (double)window[k / 2];
+        } else {
+            // Use long long to prevent integer overflow during addition
+            result[resultIdx++] = ((long long)window[k / 2 - 1] + (long long)window[k / 2]) / 2.0;
+        }
+        
+        // If we reached the end of the input array, don't try to slide further
+        if (i == numsSize) break;
+        
+        // Identify the element leaving the window and the new element entering
+        int elementToRemove = nums[i - k];
+        int elementToAdd = nums[i];
+        
+        // 1. Remove the old element by finding its index and shifting elements left
+        int removeIdx = binarySearch(window, k, elementToRemove);
+        for (int j = removeIdx; j < k - 1; j++) {
+            window[j] = window[j + 1];
+        }
+        
+        // 2. Insert the new element by finding its correct position and shifting right
+        int insertIdx = binarySearch(window, k - 1, elementToAdd);
+        for (int j = k - 1; j > insertIdx; j--) {
+            window[j] = window[j - 1];
+        }
+        window[insertIdx] = elementToAdd;
+    }
+    
+    free(window);
+    return result;
+}
